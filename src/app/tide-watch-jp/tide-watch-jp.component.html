@@ -1,0 +1,29 @@
+<div class="header">
+    <p-dropdown
+        [options]="stations"
+        [(ngModel)]="selectedStation"
+        optionLabel="name"
+        placeholder="Select a Station"
+        (onChange)="onChange($event)"
+    />
+    <p-calendar
+        [inline]="false"
+        [touchUI]="true"
+        [showIcon]="true"
+        selectionMode="range"
+        iconDisplay="input"
+        [showButtonBar]="false"
+        [(ngModel)]="calendarDate"
+        (onSelect)="onSelectDate($event)"
+    />
+</div>
+<div class="content">
+    <div
+        echarts
+        #chart
+        (chartInit)="onChartInit($event)"
+        [options]="echartOptions"
+        [initOpts]="echartInitOptions"
+        class="demo-chart"
+    ></div>
+</div>
