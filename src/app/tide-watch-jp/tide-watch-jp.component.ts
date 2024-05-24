@@ -198,6 +198,9 @@ export class TideWatchJpComponent implements OnInit {
         axisLabel: {
           formatter: '{MM}/{dd}\n{HH}:{mm}',
         },
+        axisLine: {
+          onZero: false,
+        },
         axisPointer: {
           label: {
             show: true,
@@ -226,6 +229,7 @@ export class TideWatchJpComponent implements OnInit {
           smooth: true,
           data: visibleData,
           areaStyle: {
+            origin: 'start',
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
               {
                 offset: 0,
