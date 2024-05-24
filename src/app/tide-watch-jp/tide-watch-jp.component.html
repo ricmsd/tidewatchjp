@@ -3,8 +3,9 @@
         [options]="stations"
         [(ngModel)]="selectedStation"
         optionLabel="name"
-        placeholder="Select a Station"
         (onChange)="onChange($event)"
+        [checkmark]="false"
+        dropdownIcon="pi pi-map-marker"
     />
     <p-calendar
         [inline]="false"
@@ -19,11 +20,18 @@
 </div>
 <div class="content">
     <div
+        class="chart"
         echarts
         #chart
         (chartInit)="onChartInit($event)"
         [options]="echartOptions"
         [initOpts]="echartInitOptions"
-        class="demo-chart"
     ></div>
+    <div
+        class="source"
+    >
+        <span>The tidal data from the <a href="https://www.jma.go.jp/jma/index.html">JMA</a>.</span>
+    </div>
+</div>
+<div class="footer">
 </div>
