@@ -10,6 +10,9 @@
 .content {
     display: flex;
     flex-direction: column;
+    .chart {
+        height: 500px;
+    }
     .source {
         margin: 0 40px;
         display: flex;

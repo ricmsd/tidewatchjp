@@ -55,7 +55,7 @@ export class TideWatchJpComponent implements OnInit {
   selectedStation: Station | undefined;
   tides: TideData[] = []
 
-  calendarDate: Date[] = [new Date(), new Date()];
+  calendarDate: (Date|null)[] = [new Date(), null];
 
   constructor() {
   }
@@ -72,7 +72,7 @@ export class TideWatchJpComponent implements OnInit {
     const pref = JSON.parse(localStorage.getItem('preference') || "{}");
     this.calendarDate = [
       pref.start ? new Date(pref.start) : new Date(),
-      pref.end ? new Date(pref.end) : new Date()
+      pref.end ? new Date(pref.end) : null
     ];
     this.#http.get<Station[]>('assets/station.json')
       .subscribe(data => {
@@ -103,7 +103,10 @@ export class TideWatchJpComponent implements OnInit {
     this.createChart(this.tides);
   }
 
-  private formatDate(date: Date): string {
+  private formatDate(date: Date | null): string {
+    if (!date) {
+      return '';
+    }
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -157,12 +160,12 @@ export class TideWatchJpComponent implements OnInit {
   }
 
   private createChart(data: TideData[]): void {
-    this.calendarDate[0].setHours(0, 0, 0);
+    this.calendarDate[0]?.setHours(0, 0, 0);
     const startDate = this.formatDate(this.calendarDate[0]);
     if (this.calendarDate[1]) {
       this.calendarDate[1].setHours(23, 59, 59);
     } else {
-      this.calendarDate[0].setHours(23, 59, 59);
+      this.calendarDate[0]?.setHours(23, 59, 59);
     }
     const endDate = this.calendarDate[1]
       ? this.formatDate(this.calendarDate[1])
@@ -186,7 +189,9 @@ export class TideWatchJpComponent implements OnInit {
       grid: {
         left: 40,
         right: 40,
-        bottom: 80
+        top: 40,
+        height: '390px',
+        containLabel: true
       },
       xAxis: {
         type: 'time',
@@ -249,7 +254,11 @@ export class TideWatchJpComponent implements OnInit {
         {
           type: 'slider',
           start: 0,
-          end: 100
+          end: 100,
+          moveHandleSize: 12,
+          handleSize: '100%',
+          height: 50,
+          bottom: 16
         }
       ],
     };
