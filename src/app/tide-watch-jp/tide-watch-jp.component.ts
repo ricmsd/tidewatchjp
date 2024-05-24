@@ -187,8 +187,8 @@ export class TideWatchJpComponent implements OnInit {
 
     this.echartOptions = {
       grid: {
-        left: 40,
-        right: 40,
+        left: 0,
+        right: 30,
         top: 40,
         height: '390px',
         containLabel: true
