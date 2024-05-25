@@ -5,6 +5,8 @@ import { NgxEchartsDirective, provideEcharts } from 'ngx-echarts';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { FormsModule } from '@angular/forms';
+import { SidebarModule } from 'primeng/sidebar';
+import { InputSwitchModule } from 'primeng/inputswitch';
 import * as echarts from 'echarts';
 import * as SunCalc from 'suncalc';
 
@@ -24,12 +26,6 @@ interface TideData {
   low?: boolean;
 }
 
-interface Preference {
-  id: string;
-  start: number;
-  end: number;
-}
-
 @Component({
   selector: 'app-tide-watch-jp',
   standalone: true,
@@ -38,7 +34,9 @@ interface Preference {
     HttpClientModule,
     FormsModule,
     DropdownModule,
-    CalendarModule
+    CalendarModule,
+    SidebarModule,
+    InputSwitchModule
   ],
   templateUrl: './tide-watch-jp.component.html',
   styleUrl: './tide-watch-jp.component.scss',
@@ -58,6 +56,11 @@ export class TideWatchJpComponent implements OnInit {
 
   calendarDate: (Date|null)[] = [new Date(), null];
 
+  visibleSidebar: boolean = false;
+  visibleSunriseSunset: boolean = true;
+  visibleHighTideMark: boolean = true;
+  visibleLowTideMark: boolean = true;
+
   constructor() {
   }
 
@@ -65,7 +68,10 @@ export class TideWatchJpComponent implements OnInit {
     localStorage.setItem('preference', JSON.stringify({
       id: this.selectedStation?.id,
       start: this.calendarDate[0]?.getTime(),
-      end: this.calendarDate[1]?.getTime()
+      end: this.calendarDate[1]?.getTime(),
+      daytime: this.visibleSunriseSunset,
+      hightide: this.visibleHighTideMark,
+      lowtide: this.visibleLowTideMark
     }));
   }
 
@@ -75,6 +81,15 @@ export class TideWatchJpComponent implements OnInit {
       pref.start ? new Date(pref.start) : new Date(),
       pref.end ? new Date(pref.end) : null
     ];
+    if (pref.hasOwnProperty('daytime')) {
+      this.visibleSunriseSunset = pref.daytime;
+    } 
+    if (pref.hasOwnProperty('hightide')) {
+      this.visibleHighTideMark = pref.hightide;
+    } 
+    if (pref.hasOwnProperty('lowtide')) {
+      this.visibleLowTideMark = pref.lowtide;
+    } 
     this.#http.get<Station[]>('assets/station.json')
       .subscribe(data => {
         this.stations = data;
@@ -97,6 +112,11 @@ export class TideWatchJpComponent implements OnInit {
           this.tides = this.createData(data.body);
           this.createChart(this.tides);
         });
+  }
+
+  public onChangePreference(): void {
+    this.savePreference();
+    this.createChart(this.tides);
   }
 
   public onSelectDate(value: Date): void {
@@ -184,7 +204,7 @@ export class TideWatchJpComponent implements OnInit {
       .filter(i => i.time >= startDate && i.time <= endDate)
       .map(i => [i.time, i.value]);
     const markPoint = data
-      .filter(i => i.high || i.low)
+      .filter(i => (this.visibleHighTideMark && i.high) || (this.visibleLowTideMark && i.low))
       .map(i => ({
         name: 'Mark',
         symbol: 'pin',
@@ -196,7 +216,7 @@ export class TideWatchJpComponent implements OnInit {
       }));
 
     const pieces: any = [];
-    if (this.selectedStation) {
+    if (this.selectedStation && this.visibleSunriseSunset) {
       const lat = this.convertToDecimal(this.selectedStation.lat);
       const lon = this.convertToDecimal(this.selectedStation.lon);
       const date = new Date(2024, 0, 1);

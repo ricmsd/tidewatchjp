@@ -1,4 +1,10 @@
 <div class="header">
+    <p-button
+        icon="pi pi-bars"
+        severity="secondary"
+        [text]="true"
+        (onClick)="visibleSidebar = true"
+    />
     <p-dropdown
         [options]="stations"
         [(ngModel)]="selectedStation"
@@ -37,3 +43,28 @@
 </div>
 <div class="footer">
 </div>
+
+<p-sidebar [(visible)]="visibleSidebar">
+    <h3>Preference</h3>
+    <div class="preference-item">
+        <span>sunrise/sunset</span>
+        <p-inputSwitch
+            [(ngModel)]="visibleSunriseSunset"
+            (onChange)="onChangePreference()"
+        />
+    </div>
+    <div class="preference-item">
+        <span>high tide</span>
+        <p-inputSwitch
+            [(ngModel)]="visibleHighTideMark"
+            (onChange)="onChangePreference()"
+        />
+    </div>
+    <div class="preference-item">
+        <span>low tide</span>
+        <p-inputSwitch
+            [(ngModel)]="visibleLowTideMark"
+            (onChange)="onChangePreference()"
+        />
+    </div>
+</p-sidebar>
