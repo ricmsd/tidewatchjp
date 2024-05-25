@@ -6,6 +6,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { FormsModule } from '@angular/forms';
 import * as echarts from 'echarts';
+import * as SunCalc from 'suncalc';
 
 interface Station {
   index: number;
@@ -159,6 +160,15 @@ export class TideWatchJpComponent implements OnInit {
     return tides;
   }
 
+  private convertToDecimal(coordinate: string): number {
+    const parts = coordinate.split("゜");
+    const degrees = parseFloat(parts[0]);
+    const minutesSeconds = parts[1].split("'");
+    const minutes = parseFloat(minutesSeconds[0]);
+    const decimalDegrees = degrees + minutes / 60;
+    return decimalDegrees;
+  }
+
   private createChart(data: TideData[]): void {
     this.calendarDate[0]?.setHours(0, 0, 0);
     const startDate = this.formatDate(this.calendarDate[0]);
@@ -184,6 +194,23 @@ export class TideWatchJpComponent implements OnInit {
           color: i.high ? 'red' : 'blue'
         }
       }));
+
+    const pieces: any = [];
+    if (this.selectedStation) {
+      const lat = this.convertToDecimal(this.selectedStation.lat);
+      const lon = this.convertToDecimal(this.selectedStation.lon);
+      const date = new Date(2024, 0, 1);
+      for (let i = 0; i < 366; i++) {
+        const times = SunCalc.getTimes(date, lat, lon);
+        // console.log(times);
+        pieces.push({
+          gt: times.sunrise.getTime(),
+          lt: times.sunset.getTime(),
+          color: 'rgba(255,255,255,0.5)'
+        });
+        date.setDate(date.getDate() + 1);
+      }
+    }
 
     this.echartOptions = {
       grid: {
@@ -219,6 +246,15 @@ export class TideWatchJpComponent implements OnInit {
       yAxis: {
         type: 'value',
       },
+      visualMap: [
+        {
+          type: 'piecewise',
+          show: false,
+          dimension: 0,
+          seriesIndex: 1,
+          pieces: pieces
+        },
+      ],
       series: [
         {
           type: 'line',
@@ -233,7 +269,7 @@ export class TideWatchJpComponent implements OnInit {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
               {
                 offset: 0,
-                color: 'rgba(58,77,233,0.3)'
+                color: 'rgba(58,77,233,0.5)'
               },
               {
                 offset: 1,
@@ -244,7 +280,19 @@ export class TideWatchJpComponent implements OnInit {
           markPoint: {
             data: markPoint
           }
-        }
+        },
+        {
+          type: 'line',
+          lineStyle: {
+            width: 0
+          },
+          symbol: 'none',
+          smooth: true,
+          data: visibleData,
+          areaStyle: {
+            origin: 'start'
+          },
+        },
       ],
       tooltip: {
         trigger: 'axis',
