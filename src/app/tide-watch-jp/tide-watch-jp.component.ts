@@ -236,8 +236,8 @@ export class TideWatchJpComponent implements OnInit {
       grid: {
         left: 0,
         right: 30,
-        top: 40,
-        height: '390px',
+        top: 50,
+        height: '380px',
         containLabel: true
       },
       xAxis: {

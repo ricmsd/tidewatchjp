@@ -5,7 +5,14 @@
 }
 .header {
     display: flex;
-    justify-content: space-around;
+    > .sidebar-button {
+        width: 36px;
+    }
+    > .station-calendar {
+        width: calc(100% - 36px);
+        display: flex;
+        justify-content: space-around;
+    }
 }
 .content {
     display: flex;
