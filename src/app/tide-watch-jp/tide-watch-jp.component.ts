@@ -278,6 +278,7 @@ export class TideWatchJpComponent implements OnInit {
       series: [
         {
           type: 'line',
+          name: 'tidegraph',
           lineStyle: {
             width: 0
           },
@@ -303,6 +304,7 @@ export class TideWatchJpComponent implements OnInit {
         },
         {
           type: 'line',
+          name: 'daytime',
           lineStyle: {
             width: 0
           },
@@ -316,6 +318,13 @@ export class TideWatchJpComponent implements OnInit {
       ],
       tooltip: {
         trigger: 'axis',
+        formatter: function(params: any) {
+          console.log(params);
+          if (params[0].seriesName === 'tidegraph') {
+            return '' + params[0].value[1] + 'cm';
+          }
+          return '';
+      }
       },
       dataZoom: [
         {
